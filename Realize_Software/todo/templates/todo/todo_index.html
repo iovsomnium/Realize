@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %} White Board {% endblock %}
+
+{% block extra-style %}
+    <style>
+        body {
+            text-align: center;
+            background-color: #ddd;
+        }
+        .inputBox {
+            margin: auto;
+            width: 90%;
+            background: white;
+            height: 50px;
+            border-radius: 50px;
+            line-height: 50px;
+        }
+        .inputBox .name {
+            border-style: none;
+            border-bottom: 1px solid #ddd;
+            width: 80px;
+            padding-left: 20px;
+            line-height: 20px;
+        }
+        .inputBox .item {
+            border-style: none;
+            border-bottom: 1px solid #ddd;
+            width: 400px;
+            margin-left: 50px;
+            padding-left: 20px;
+            line-height: 20px;
+        }
+        .todoList {
+            list-style: none;
+            padding: 10px 0;
+            text-align: left;
+        }
+        .todoList li {
+            display: flex;
+            height: 50px;
+            line-height: 50px;
+            margin: 0.5rem 0;
+            padding: 0 0.9rem;
+            background: white;
+            border-radius: 5px;
+        }
+        .removeBtn {
+            margin-left: auto;
+            font-size: 20px;
+        }
+        .removeBtn:hover{
+            color: red;
+        }
+    </style>
+    {% endblock %}
+
+    {% block content %}
+    <div id="app">
+
+        <h1>White Board</h1>
+        <strong>이동시에 작성하고 이동해 주세요.</strong>
+        <br>
+
+        <ul class="inputBox">
+            <li>
+            <input class="name" type="text" placeholder="이름" v-model.trim="name">
+            <input class="name" type="text" placeholder="교시" v-model.trim="dtime">
+            <input class="item" type="text" placeholder="사유등을 입력해주세요" v-model.trim="todo" v-on:keyup.enter='add_todo()'><!--databinding 양방향으로 데이터 전달 -->
+ 
+            <button v-on:click='add_todo()' class="btn btn-dark btn-sm">ADD</button>
+            </li>
+        </ul>
+    
+        <ul class="todoList">
+            <li v-for="(todo, index) in todoList">
+                <span>[[ todo.name ]]:::[[todo.dtime]]:::[[ todo.todo ]]</span>
+                <span class="removeBtn" v-on:click="remove_todo(todo, index)" style="cursor: pointer;">x</span>
+            </li>
+        </ul>
+
+    </div>
+
+{% endblock %}
+
+{% block extra-script %}
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script>
+    axios.defaults.xsrfCookieName='csrftoken';
+    axios.defaults.xsrfHeaderName='X-CSRFToken';
+    var vm = new Vue({
+        delimiters:['[[',']]'],
+        el:'#app',
+        data:{  
+            name:'',
+            todo:'',
+            dtime:'',
+            todoList:[
+            ],
+        },
+
+        created: function(){
+            console.log("created()");
+            this.fetch_all_todo();
+        },
+
+        methods: {
+            fetch_all_todo: function () {
+                console.log("fetch_all_todo()...");
+
+                var vm = this;
+                axios.get('/api/todo/list/')
+                    .then(function (res) {
+                        console.log("GET RES", res);
+                        vm.todoList = res.data;
+                    })
+                    .catch(function (err) {
+                        console.log("GET ERR", err);
+                    })
+            },
+            
+            add_todo:function(){
+                console.log("add_todo");
+                if(this.name=='')return;
+                if(this.todo=='')return;
+                if(this.dtime=='')return;
+
+                var vm = this;
+                var postData = {name: this.name, dtime: this.dtime, todo: this.todo, };
+
+                axios.post('/api/todo/create/', postData)
+                    .then(function (res){
+                        console.log("POST RES", res);
+                        vm.todoList.push({id: res.data.id, name: res.data.name, dtime: res.data.dtime, todo: res.data.todo});
+                    })
+                    .catch(function (err){
+                        console.log("POST ERR", err)
+                    })
+
+                this.name=this.dtime=this.todo='';
+            },
+            remove_todo: function (todo, index) {
+                console.log("remove_todo()...", index);
+                if(confirm("Really delete ?")==false) return;
+
+                var vm = this;
+                axios.delete('/api/todo/' + todo.id + '/delete/', {})
+                    .then(function (res) {
+                        console.log("DELETE RES", res);
+                        vm.todoList.splice(index, 1);
+                    })
+                    .catch(function (err) {
+                        console.log("DELETE ERR", err);
+                    })
+            },
+        },
+    })
+    </script>
+{% endblock %}
