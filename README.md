@@ -23,3 +23,6 @@ In the school, Our team watched when we were moved in the evening from school, t
 
 ## 🤔 Result / 결과물
 - 실행 능력 부족으로 프로젝트 끝맺음을 못하였습니다.
+
+## 😏 프로젝트 시작법 / how to start project
+"``` python runserver ```"
