@@ -6,11 +6,6 @@
 ### Mean : Checking the students locations 
 ### 의미 : 깨닫다, 알아차리다라는 뜻에 맞게 선생님 또는 학생의 위치 동향을 파악하는 프로젝트
 
-
-# 🔒Project : Che.Ti.Ble / 프로젝트 : 체티블
-### Mean : Shot for Change, Time Table / Time Table app
-### 의미 : Change Time Table의 약어 / 시간표 앱
-
 ## ❓ Purpose / 목적
 In the school, Our team watched when we were moved in the evening from school, teachers would have to come into class, look at the whiteboard, and figure out where the students went. so we want solve the problem
 
